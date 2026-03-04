@@ -1,0 +1,16 @@
+# Upload-Verzeichnis (Benutzerdaten)
+upload/
+upload/.thumbs/*
+!upload/.thumbs/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
