@@ -4,6 +4,8 @@
 
 Web application for file management on Synology NAS via Web Station.
 
+![File Manager Screenshot](screenshot.jpg)
+
 ## 🚀 Key Features
 
 ### File Management
