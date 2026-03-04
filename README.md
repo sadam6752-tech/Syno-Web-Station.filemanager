@@ -3,8 +3,6 @@ Web application for file management on Synology NAS via Web Station. / Webanwend
 
 # File Manager for Synology NAS WEB-Station
 
-Web application for file management on Synology NAS via Web Station.
-
 ## 🚀 Key Features
 
 ### File Management
