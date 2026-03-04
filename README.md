@@ -1,4 +1,7 @@
 # Syno-Web-Station.filemanager
+
+**Version:** v1.0.0
+
 Web application for file management on Synology NAS via Web Station. / Webanwendung zur Dateiverwaltung auf Synology NAS über Web Station.
 
 # File Manager for Synology NAS WEB-Station

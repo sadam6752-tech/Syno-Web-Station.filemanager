@@ -1,5 +1,7 @@
 # Dateimanager für Synology NAS
 
+**Version:** v1.0.0
+
 Webanwendung zur Dateiverwaltung auf Synology NAS über Web Station.
 
 ## 🚀 Hauptfunktionen

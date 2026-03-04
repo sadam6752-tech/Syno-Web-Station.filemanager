@@ -1,5 +1,7 @@
 # File Manager for Synology NAS
 
+**Version:** v1.0.0
+
 Web application for file management on Synology NAS via Web Station.
 
 ## 🚀 Key Features
