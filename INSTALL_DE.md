@@ -1,6 +1,6 @@
 # File Manager für Synology NAS
 
-**Version:** v1.0.1
+**Version:** v1.0.2
 
 Web-Dateimanager für die Arbeit mit dem `/upload`-Ordner auf Synology Web Station.
 
