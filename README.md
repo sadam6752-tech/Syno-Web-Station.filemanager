@@ -6,8 +6,8 @@ Web application for file management on Synology NAS via Web Station.
 
 ## 📸 Screenshots
 
-![File Manager - Light Theme](../Screenshot_1.jpg)
-![File Manager - Dark Theme](../Screenshot_2.jpg)
+![File Manager - Light Theme](Screenshot_1.jpg)
+![File Manager - Dark Theme](Screenshot_2.jpg)
 
 ## 🚀 Key Features
 
