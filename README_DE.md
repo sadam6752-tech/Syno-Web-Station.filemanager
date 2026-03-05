@@ -1,12 +1,18 @@
 # Dateimanager für Synology NAS
 
-**Version:** v1.0.0
+**Version:** v1.0.1
 
 Webanwendung zur Dateiverwaltung auf Synology NAS über Web Station.
 
-![Screenshot des Dateimanagers](screenshot.jpg)
-
 ## 🚀 Hauptfunktionen
+
+### Authentifizierung (optional)
+- ✅ Aktivierung/Deaktivierung über Konfiguration
+- ✅ Mehrere Benutzer
+- ✅ Sichere Passwort-Hashing (bcrypt)
+- ✅ Automatische Abmeldung nach Session-Ablauf
+- ✅ Dienstprogramm zur Passwort-Generierung
+- ✅ Anzeige des Benutzernamens in der Oberfläche
 
 ### Dateiverwaltung
 - ✅ Erstellen, Löschen und Umbenennen von Dateien und Ordnern
@@ -54,6 +60,8 @@ Webanwendung zur Dateiverwaltung auf Synology NAS über Web Station.
 - Schutz vor Directory Traversal-Angriffen
 - Überprüfung aller Pfade über `realpath()`
 - Zugriff außerhalb von BASE_PATH verboten
+- Optionales Authentifizierungssystem mit Passwort-Hashing (bcrypt)
+- Session-Schutz und automatische Abmeldung
 
 ## 💻 Technische Anforderungen
 

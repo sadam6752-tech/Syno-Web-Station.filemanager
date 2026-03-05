@@ -1,4 +1,6 @@
 <?php
+require_once 'auth.php';
+
 error_reporting(0);
 ini_set('display_errors', 0);
 
@@ -6,8 +8,8 @@ header('Content-Type: application/json; charset=utf-8');
 
 // Для Synology NAS используйте: '/volume1/web/upload'
 // Для локальной разработки используйте: __DIR__ . '/upload'
-define('BASE_PATH', __DIR__ . '/upload');
-define('THUMBS_PATH', __DIR__ . '/upload/.thumbs');
+define('BASE_PATH', BASE_PATH);
+define('THUMBS_PATH', THUMBS_PATH);
 
 // Создать папку upload если не существует
 if (!file_exists(BASE_PATH)) {

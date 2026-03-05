@@ -1,3 +1,6 @@
+<?php
+require_once 'auth.php';
+?>
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -11,6 +14,15 @@
     <header>
         <h1 id="header-title">Dateimanager</h1>
         <div class="header-controls">
+            <?php if (AUTH_ENABLED): ?>
+            <div class="user-info">
+                <i class="fas fa-user"></i>
+                <span><?php echo htmlspecialchars(getCurrentUser()); ?></span>
+                <a href="?action=logout" class="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+            <?php endif; ?>
             <div class="view-toggle">
                 <button id="view-grid" class="active" title="Grid"><i class="fas fa-th"></i></button>
                 <button id="view-list" title="List"><i class="fas fa-list"></i></button>

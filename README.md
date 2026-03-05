@@ -1,14 +1,18 @@
-# Syno-Web-Station.filemanager
+# File Manager for Synology NAS
 
-**Version:** v1.0.0
+**Version:** v1.0.1
 
-Web application for file management on Synology NAS via Web Station. / Webanwendung zur Dateiverwaltung auf Synology NAS über Web Station.
-
-![File Manager Screenshot](screenshot.jpg)
-
-# File Manager for Synology NAS WEB-Station
+Web application for file management on Synology NAS via Web Station.
 
 ## 🚀 Key Features
+
+### Authentication (optional)
+- ✅ Enable/disable via configuration
+- ✅ Multiple users support
+- ✅ Secure password hashing (bcrypt)
+- ✅ Automatic logout after session timeout
+- ✅ Password generation utility
+- ✅ Username display in interface
 
 ### File Management
 - ✅ Create, delete, and rename files and folders
@@ -56,6 +60,8 @@ Web application for file management on Synology NAS via Web Station. / Webanwend
 - Protection against directory traversal attacks
 - All paths validated via `realpath()`
 - Access outside BASE_PATH forbidden
+- Optional authentication system with password hashing (bcrypt)
+- Session protection and automatic logout
 
 ## 💻 Technical Requirements
 
