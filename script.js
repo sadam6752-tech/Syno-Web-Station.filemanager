@@ -15,6 +15,12 @@ const translations = {
         downloadSelected: 'Ausgewählte herunterladen',
         deleteSelected: 'Ausgewählte löschen',
         moveUp: 'Nach oben verschieben',
+        moveTo: 'Verschieben nach...',
+        moveToFolder: 'In Ordner verschieben',
+        selectFolder: 'Zielordner auswählen',
+        cancelMove: 'Abbrechen',
+        moveMode: 'Verschiebemodus',
+        tapFolder: 'Ordner antippen',
         copy: 'Kopieren',
         copyTitle: 'Ausgewählte Dateien kopieren',
         details: 'Details',
@@ -65,6 +71,12 @@ const translations = {
         downloadSelected: 'Download Selected',
         deleteSelected: 'Delete Selected',
         moveUp: 'Move Up',
+        moveTo: 'Move to...',
+        moveToFolder: 'Move to Folder',
+        selectFolder: 'Select destination folder',
+        cancelMove: 'Cancel',
+        moveMode: 'Move Mode',
+        tapFolder: 'Tap on folder',
         copy: 'Copy',
         copyTitle: 'Copy selected files',
         details: 'Details',
@@ -115,6 +127,12 @@ const translations = {
         downloadSelected: 'Скачать выбранные',
         deleteSelected: 'Удалить выбранные',
         moveUp: 'Переместить вверх',
+        moveTo: 'Переместить в...',
+        moveToFolder: 'Переместить в папку',
+        selectFolder: 'Выберите папку назначения',
+        cancelMove: 'Отмена',
+        moveMode: 'Режим перемещения',
+        tapFolder: 'Нажмите на папку',
         copy: 'Копировать',
         copyTitle: 'Копировать выбранные файлы',
         details: 'Детали',
@@ -159,6 +177,7 @@ let draggedPath = null;
 let selectedFiles = new Set();
 let allFiles = []; // Хранение всех файлов для поиска
 let searchTimeout = null;
+let moveMode = false; // Режим перемещения
 
 function t(key) {
     return translations[currentLang][key] || key;
@@ -300,13 +319,23 @@ async function loadFiles() {
         const fileList = document.getElementById('file-list');
         fileList.innerHTML = '';
         
-        selectedFiles.clear();
-        updateSelectionUI();
+        // Сохраняем выбранные файлы в режиме перемещения
+        const savedSelection = moveMode ? new Set(selectedFiles) : null;
+        
+        if (!moveMode) {
+            selectedFiles.clear();
+        }
         
         data.items.forEach(item => {
             fileList.appendChild(createFileElement(item));
         });
         
+        // Восстанавливаем выбранные файлы в режиме перемещения
+        if (moveMode && savedSelection) {
+            selectedFiles = savedSelection;
+        }
+        
+        updateSelectionUI();
         updateBreadcrumb();
         loadFolderStats();
         
@@ -472,18 +501,34 @@ function createFileElement(item) {
             // Игнорируем клик на чекбокс и кнопки действий
             if (e.target.classList.contains('file-checkbox') || 
                 e.target.closest('.file-actions') ||
-                e.target.closest('button')) {
+                (e.target.tagName === 'BUTTON')) {
                 return;
             }
+            
+            // Если режим перемещения активен
+            if (moveMode) {
+                e.preventDefault();
+                e.stopPropagation();
+                moveSelectedToFolder(item.path);
+                return;
+            }
+            
             navigateTo(item.path);
         };
+        
+        // Добавляем класс для режима перемещения
+        if (moveMode) {
+            div.classList.add('move-target');
+            div.style.cursor = 'pointer';
+        }
+        
         setupDropTarget(div, item.path);
     } else {
         div.onclick = (e) => {
             // Игнорируем клик на чекбокс и кнопки действий
             if (e.target.classList.contains('file-checkbox') || 
                 e.target.closest('.file-actions') ||
-                e.target.closest('button')) {
+                (e.target.tagName === 'BUTTON')) {
                 return;
             }
             downloadFile(item.path);
@@ -721,15 +766,19 @@ async function showFileInfo(path) {
 }
 
 function toggleFileSelection(event, path) {
-    event.stopPropagation();
-    
-    if (selectedFiles.has(path)) {
-        selectedFiles.delete(path);
-    } else {
-        selectedFiles.add(path);
+    try {
+        event.stopPropagation();
+        
+        if (selectedFiles.has(path)) {
+            selectedFiles.delete(path);
+        } else {
+            selectedFiles.add(path);
+        }
+        
+        updateSelectionUI();
+    } catch (error) {
+        console.error('Error in toggleFileSelection:', error);
     }
-    
-    updateSelectionUI();
 }
 
 function selectAllFiles() {
@@ -751,46 +800,79 @@ function selectAllFiles() {
 }
 
 function updateSelectionUI() {
-    const downloadBtn = document.getElementById('btn-download-selected');
-    const deleteBtn = document.getElementById('btn-delete-selected');
-    const moveUpBtn = document.getElementById('btn-move-up');
-    const copyBtn = document.getElementById('btn-copy');
-    const selectAllBtn = document.getElementById('btn-select-all');
-    
-    const hasSelection = selectedFiles.size > 0;
-    const canMoveUp = hasSelection && currentPath !== '';
-    
-    if (downloadBtn) {
-        downloadBtn.disabled = !hasSelection;
-        downloadBtn.querySelector('span').textContent = t('downloadSelected') + (hasSelection ? ` (${selectedFiles.size})` : '');
+    try {
+        const downloadBtn = document.getElementById('btn-download-selected');
+        const deleteBtn = document.getElementById('btn-delete-selected');
+        const moveUpBtn = document.getElementById('btn-move-up');
+        const moveToBtn = document.getElementById('btn-move-to');
+        const copyBtn = document.getElementById('btn-copy');
+        const selectAllBtn = document.getElementById('btn-select-all');
+        
+        const hasSelection = selectedFiles.size > 0;
+        const canMoveUp = hasSelection && currentPath !== '';
+        
+        if (downloadBtn) {
+            downloadBtn.disabled = !hasSelection;
+            const span = downloadBtn.querySelector('span');
+            if (span) {
+                span.textContent = t('downloadSelected') + (hasSelection ? ` (${selectedFiles.size})` : '');
+            }
+        }
+        
+        if (deleteBtn) {
+            deleteBtn.disabled = !hasSelection;
+            const span = deleteBtn.querySelector('span');
+            if (span) {
+                span.textContent = t('deleteSelected') + (hasSelection ? ` (${selectedFiles.size})` : '');
+            }
+        }
+        
+        if (moveUpBtn) {
+            moveUpBtn.disabled = !canMoveUp;
+            const span = moveUpBtn.querySelector('span');
+            if (span) {
+                span.textContent = t('moveUp') + (hasSelection ? ` (${selectedFiles.size})` : '');
+            }
+        }
+        
+        if (moveToBtn) {
+            // В режиме перемещения кнопка всегда активна для отмены
+            if (moveMode) {
+                moveToBtn.disabled = false;
+            } else {
+                moveToBtn.disabled = !hasSelection;
+                const span = moveToBtn.querySelector('span');
+                if (span) {
+                    span.textContent = t('moveTo') + (hasSelection ? ` (${selectedFiles.size})` : '');
+                }
+            }
+        }
+        
+        if (copyBtn) {
+            copyBtn.disabled = !hasSelection;
+            const span = copyBtn.querySelector('span');
+            if (span) {
+                span.textContent = t('copy') + (hasSelection ? ` (${selectedFiles.size})` : '');
+            }
+        }
+        
+        if (selectAllBtn) {
+            const span = selectAllBtn.querySelector('span');
+            if (span) {
+                span.textContent = hasSelection ? t('deselectAll') : t('selectAll');
+            }
+        }
+        
+        // Update checkbox states
+        document.querySelectorAll('.file-checkbox').forEach(cb => {
+            cb.checked = selectedFiles.has(cb.dataset.path);
+        });
+        
+        // Update selection statistics
+        updateSelectionStats();
+    } catch (error) {
+        console.error('Error in updateSelectionUI:', error);
     }
-    
-    if (deleteBtn) {
-        deleteBtn.disabled = !hasSelection;
-        deleteBtn.querySelector('span').textContent = t('deleteSelected') + (hasSelection ? ` (${selectedFiles.size})` : '');
-    }
-    
-    if (moveUpBtn) {
-        moveUpBtn.disabled = !canMoveUp;
-        moveUpBtn.querySelector('span').textContent = t('moveUp') + (hasSelection ? ` (${selectedFiles.size})` : '');
-    }
-    
-    if (copyBtn) {
-        copyBtn.disabled = !hasSelection;
-        copyBtn.querySelector('span').textContent = t('copy') + (hasSelection ? ` (${selectedFiles.size})` : '');
-    }
-    
-    if (selectAllBtn) {
-        selectAllBtn.querySelector('span').textContent = hasSelection ? t('deselectAll') : t('selectAll');
-    }
-    
-    // Update checkbox states
-    document.querySelectorAll('.file-checkbox').forEach(cb => {
-        cb.checked = selectedFiles.has(cb.dataset.path);
-    });
-    
-    // Update selection statistics
-    updateSelectionStats();
 }
 
 async function downloadSelectedFiles() {
@@ -889,6 +971,85 @@ async function moveSelectedUp() {
         }
     }
     
+    selectedFiles.clear();
+    loadFiles();
+    
+    if (errorCount > 0) {
+        alert(`Moved ${successCount} items. ${errorCount} errors occurred.`);
+    }
+}
+
+function enableMoveMode() {
+    if (selectedFiles.size === 0) {
+        return;
+    }
+    
+    moveMode = true;
+    document.body.classList.add('move-mode');
+    
+    // Обновляем UI
+    const moveBtn = document.getElementById('btn-move-to');
+    if (moveBtn) {
+        moveBtn.innerHTML = `<i class="fas fa-times"></i> <span>${t('cancelMove')}</span>`;
+        moveBtn.classList.add('btn-danger');
+        moveBtn.disabled = false;
+    }
+    
+    // Показываем подсказку
+    const toolbar = document.querySelector('.toolbar');
+    const hint = document.createElement('div');
+    hint.id = 'move-mode-hint';
+    hint.className = 'move-mode-hint';
+    hint.innerHTML = `<i class="fas fa-hand-pointer"></i> ${t('moveMode')}: ${t('tapFolder')}`;
+    toolbar.appendChild(hint);
+    
+    // Перезагружаем список файлов для добавления обработчиков
+    loadFiles();
+}
+
+function disableMoveMode() {
+    moveMode = false;
+    document.body.classList.remove('move-mode');
+    
+    const moveBtn = document.getElementById('btn-move-to');
+    if (moveBtn) {
+        moveBtn.innerHTML = `<i class="fas fa-folder-open"></i> <span>${t('moveTo')}</span>`;
+        moveBtn.classList.remove('btn-danger');
+    }
+    
+    const hint = document.getElementById('move-mode-hint');
+    if (hint) {
+        hint.remove();
+    }
+    
+    loadFiles();
+}
+
+async function moveSelectedToFolder(targetPath) {
+    if (selectedFiles.size === 0) {
+        return;
+    }
+    
+    const files = Array.from(selectedFiles);
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (const file of files) {
+        // Не перемещаем папку саму в себя
+        if (file === targetPath) {
+            continue;
+        }
+        
+        try {
+            await moveItem(file, targetPath);
+            successCount++;
+        } catch (error) {
+            errorCount++;
+            console.error('Error moving file:', file, error);
+        }
+    }
+    
+    disableMoveMode();
     selectedFiles.clear();
     loadFiles();
     
@@ -1051,6 +1212,13 @@ document.getElementById('btn-copy').onclick = copySelectedFiles;
 document.getElementById('btn-download-selected').onclick = downloadSelectedFiles;
 document.getElementById('btn-delete-selected').onclick = deleteSelectedFiles;
 document.getElementById('btn-move-up').onclick = moveSelectedUp;
+document.getElementById('btn-move-to').onclick = () => {
+    if (moveMode) {
+        disableMoveMode();
+    } else {
+        enableMoveMode();
+    }
+};
 
 document.getElementById('view-grid').onclick = () => {
     currentView = 'grid';

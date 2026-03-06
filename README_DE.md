@@ -4,11 +4,6 @@
 
 Webanwendung zur Dateiverwaltung auf Synology NAS über Web Station.
 
-## 📸 Screenshots
-
-![Dateimanager - Helles Theme](Screenshot_1.jpg)
-![Dateimanager - Dunkles Theme](Screenshot_2.jpg)
-
 ## 🚀 Hauptfunktionen
 
 ### Authentifizierung (optional)

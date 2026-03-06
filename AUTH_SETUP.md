@@ -1,6 +1,6 @@
 # Настройка авторизации / Authentication Setup
 
-**Версия / Version:** v1.0.1
+**Версия / Version:** v1.0.2
 
 ## Русский (Russian)
 

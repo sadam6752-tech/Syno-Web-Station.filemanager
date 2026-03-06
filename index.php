@@ -8,7 +8,7 @@ require_once 'auth.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.0.2">
 </head>
 <body>
     <header>
@@ -55,6 +55,7 @@ require_once 'auth.php';
             <div class="actions">
                 <button id="btn-select-all" title="Alle auswählen / Alle abwählen"><i class="fas fa-check-square"></i> <span id="btn-select-all-text">Alle auswählen</span></button>
                 <button id="btn-copy" disabled title="Ausgewählte kopieren"><i class="fas fa-copy"></i> <span id="btn-copy-text">Kopieren</span></button>
+                <button id="btn-move-to" disabled title="Ausgewählte in Ordner verschieben"><i class="fas fa-folder-open"></i> <span id="btn-move-to-text">Verschieben nach...</span></button>
                 <button id="btn-move-up" disabled title="Ausgewählte in übergeordneten Ordner verschieben"><i class="fas fa-level-up-alt"></i> <span id="btn-move-up-text">Nach oben verschieben</span></button>
                 <button id="btn-download-selected" disabled title="Ausgewählte Dateien herunterladen"><i class="fas fa-download"></i> <span id="btn-download-selected-text">Ausgewählte herunterladen</span></button>
                 <button id="btn-delete-selected" disabled class="btn-danger" title="Ausgewählte Dateien löschen"><i class="fas fa-trash"></i> <span id="btn-delete-selected-text">Ausgewählte löschen</span></button>
@@ -92,6 +93,6 @@ require_once 'auth.php';
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=1.0.2"></script>
 </body>
 </html>
