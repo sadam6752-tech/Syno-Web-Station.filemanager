@@ -388,6 +388,15 @@ main {
     border-radius: 8px;
     max-width: 500px;
     width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    margin-bottom: 1rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .modal-content .close {
@@ -956,6 +965,8 @@ body.dark-theme .file-item.search-highlight .file-name {
 .file-info-details p {
     margin: 0.5rem 0;
     line-height: 1.6;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .file-info-details strong {
@@ -1038,5 +1049,194 @@ body.dark-theme .move-mode-hint {
     .move-mode-hint {
         font-size: 0.9rem;
         padding: 0.6rem 0.8rem;
+    }
+}
+
+/* ========================================
+   Stream-URL Bereich im Info-Modal
+   ======================================== */
+
+.url-separator {
+    margin: 1.5rem 0 1rem 0;
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .url-separator {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.stream-url-section {
+    margin-top: 1rem;
+}
+
+.stream-url-section p strong {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #2196f3;
+    margin-bottom: 0.75rem;
+}
+
+.dark-theme .stream-url-section p strong {
+    color: #60a5fa;
+}
+
+.url-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stream-url-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f8f9fa;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.85rem;
+    color: #333;
+    cursor: text;
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.dark-theme .stream-url-input {
+    background: #1e293b;
+    border-color: #374151;
+    color: #e5e7eb;
+}
+
+.stream-url-input:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.dark-theme .stream-url-input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+.url-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-copy-url,
+.btn-open-url {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-copy-url {
+    background: #2196f3;
+    color: white;
+}
+
+.btn-copy-url:hover {
+    background: #1976d2;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+}
+
+.btn-open-url {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-open-url:hover {
+    background: #388e3c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+.dark-theme .btn-copy-url {
+    background: #1976d2;
+}
+
+.dark-theme .btn-copy-url:hover {
+    background: #1565c0;
+}
+
+.dark-theme .btn-open-url {
+    background: #388e3c;
+}
+
+.dark-theme .btn-open-url:hover {
+    background: #2e7d32;
+}
+
+@media (max-width: 768px) {
+    .url-buttons {
+        flex-direction: column;
+    }
+
+    .btn-copy-url,
+    .btn-open-url {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   Toast-Nachrichten
+   ======================================== */
+
+.toast-notification {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    background: #333;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-size: 0.95rem;
+    font-weight: 500;
+    z-index: 10000;
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.toast-notification.toast-success {
+    background: #4caf50;
+}
+
+.toast-notification.toast-error {
+    background: #f44336;
+}
+
+.toast-notification.toast-info {
+    background: #2196f3;
+}
+
+.toast-notification.toast-hide {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+}
+
+@media (max-width: 768px) {
+    .toast-notification {
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
     }
 }

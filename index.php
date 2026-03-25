@@ -8,7 +8,7 @@ require_once 'auth.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=1.0.2">
+    <link rel="stylesheet" href="style.css?v=1.0.6">
 </head>
 <body>
     <header>
@@ -93,6 +93,6 @@ require_once 'auth.php';
         </div>
     </div>
 
-    <script src="script.js?v=1.0.2"></script>
+    <script src="script.js?v=1.0.6"></script>
 </body>
 </html>

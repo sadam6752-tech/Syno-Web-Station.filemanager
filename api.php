@@ -1,15 +1,11 @@
 <?php
 require_once 'auth.php';
+require_once 'config.php';
 
 error_reporting(0);
 ini_set('display_errors', 0);
 
 header('Content-Type: application/json; charset=utf-8');
-
-// Для Synology NAS используйте: '/volume1/web/upload'
-// Для локальной разработки используйте: __DIR__ . '/upload'
-define('BASE_PATH', BASE_PATH);
-define('THUMBS_PATH', THUMBS_PATH);
 
 // Создать папку upload если не существует
 if (!file_exists(BASE_PATH)) {
@@ -19,6 +15,50 @@ if (!file_exists(BASE_PATH)) {
 // Создать папку для миниатюр
 if (!file_exists(THUMBS_PATH)) {
     @mkdir(THUMBS_PATH, 0755, true);
+}
+
+/**
+ * Basis-URL für direkte Dateizugriffe ermitteln
+ * Wenn BASE_URL leer ist, wird sie automatisch aus Server-Daten konstruiert
+ * Gibt die URL OHNE trailing slash zurück
+ */
+function getBaseUrl() {
+    if (!empty(BASE_URL)) {
+        return rtrim(trim(BASE_URL), '/');
+    }
+
+    // Automatische Erkennung
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ||
+                 (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+
+    // Verzeichnis der api.php (z.B. /Dateimanager oder /)
+    $scriptDir = dirname($scriptName);
+    
+    // Upload-Pfad relativ zur api.php berechnen
+    $uploadPath = str_replace(BASE_PATH, '', THUMBS_PATH);
+    $uploadPath = trim($uploadPath, '/');
+    $uploadPath = dirname($uploadPath); // Von .thumbs zu upload oder .
+
+    // Wenn upload im gleichen Verzeichnis wie api.php ist
+    if ($uploadPath === '.' || $uploadPath === '') {
+        $uploadPath = 'upload';
+    }
+
+    // URL korrekt zusammensetzen
+    $baseUrl = $protocol . '://' . rtrim($host, '/');
+    
+    // Script-Verzeichnis hinzufügen (nur wenn nicht Root)
+    if ($scriptDir !== '/' && $scriptDir !== '\\' && $scriptDir !== '.') {
+        $baseUrl .= rtrim($scriptDir, '/');
+    }
+    
+    // Upload-Pfad hinzufügen
+    $baseUrl .= '/' . ltrim($uploadPath, '/');
+    
+    // Trailing slash entfernen
+    return rtrim($baseUrl, '/');
 }
 
 function validatePath($path) {
@@ -571,7 +611,11 @@ try {
                 $files = array_diff(scandir($fullPath), ['.', '..', '.thumbs']);
                 $info['items_count'] = count($files);
             }
-            
+
+            // Direkte URL für Media-Player hinzufügen
+            $cleanPath = ltrim(str_replace('\\', '/', $path), '/');
+            $info['direct_url'] = getBaseUrl() . '/' . $cleanPath;
+
             echo json_encode(['success' => true, 'info' => $info]);
             break;
             

@@ -1,5 +1,6 @@
 <?php
 // Конфигурация файлового менеджера
+// Version: 1.0.6
 
 // Включить/выключить авторизацию
 // true - требуется авторизация, false - открытый доступ
@@ -23,3 +24,9 @@ define('BASE_PATH', __DIR__ . '/upload');
 
 // Путь для миниатюр
 define('THUMBS_PATH', __DIR__ . '/upload/.thumbs');
+
+// Basis-URL für direkte Dateizugriffe (für Media-Player wie VLC, Dune HD)
+// Beispiel: http://192.168.1.100/upload
+// Oder: http://nas.local/Dateimanager/upload
+// Leer lassen für automatische Erkennung aus window.location im Frontend
+define('BASE_URL', '');

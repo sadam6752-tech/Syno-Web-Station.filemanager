@@ -53,7 +53,11 @@ const translations = {
         moveUpTitle: 'Ausgewählte in übergeordneten Ordner verschieben',
         newFolderTitle: 'Neuen Ordner erstellen',
         newFileTitle: 'Neue Datei erstellen',
-        uploadTitle: 'Dateien hochladen'
+        uploadTitle: 'Dateien hochladen',
+        streamUrl: 'Stream-URL',
+        copyUrl: 'Kopieren',
+        openUrl: 'Öffnen',
+        urlCopied: 'URL kopiert!'
     },
     en: {
         title: 'File Manager',
@@ -109,7 +113,11 @@ const translations = {
         moveUpTitle: 'Move selected to parent folder',
         newFolderTitle: 'Create new folder',
         newFileTitle: 'Create new file',
-        uploadTitle: 'Upload files'
+        uploadTitle: 'Upload files',
+        streamUrl: 'Stream URL',
+        copyUrl: 'Copy',
+        openUrl: 'Open',
+        urlCopied: 'URL copied!'
     },
     ru: {
         title: 'Файловый менеджер',
@@ -165,7 +173,11 @@ const translations = {
         moveUpTitle: 'Переместить выбранные в родительскую папку',
         newFolderTitle: 'Создать новую папку',
         newFileTitle: 'Создать новый файл',
-        uploadTitle: 'Загрузить файлы'
+        uploadTitle: 'Загрузить файлы',
+        streamUrl: 'URL потока',
+        copyUrl: 'Копировать',
+        openUrl: 'Открыть',
+        urlCopied: 'URL скопирован!'
     }
 };
 
@@ -181,6 +193,12 @@ let moveMode = false; // Режим перемещения
 
 function t(key) {
     return translations[currentLang][key] || key;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function updateLanguage() {
@@ -754,15 +772,85 @@ async function showFileInfo(path) {
             if (info.exif.aperture) html += `<p><strong>Aperture:</strong> f/${info.exif.aperture}</p>`;
             if (info.exif.iso) html += `<p><strong>ISO:</strong> ${info.exif.iso}</p>`;
         }
-        
+
         html += '</div>';
-        
+
+        // Stream-URL Bereich für Dateien (nicht für Ordner)
+        if (info.type === 'file' && info.direct_url) {
+            html += '<hr class="url-separator">';
+            html += '<div class="stream-url-section">';
+            html += `<p><strong><i class="fas fa-broadcast-tower"></i> ${t('streamUrl')}:</strong></p>`;
+            html += `<div class="url-input-container">`;
+            html += `<input type="text" id="stream-url-input" class="stream-url-input" value="${escapeHtml(info.direct_url)}" readonly>`;
+            html += `<div class="url-buttons">`;
+            html += `<button onclick="copyDirectUrl()" class="btn-copy-url" title="${t('copyUrl')}"><i class="fas fa-copy"></i> ${t('copyUrl')}</button>`;
+            html += `<button onclick="openInPlayer()" class="btn-open-url" title="${t('openUrl')}"><i class="fas fa-play"></i> ${t('openUrl')}</button>`;
+            html += `</div>`;
+            html += `</div>`;
+            html += `</div>`;
+        }
+
+        html += '</div>';
+
         modalBody.innerHTML = html;
         modal.classList.add('active');
-        
+
     } catch (error) {
         alert('Error: ' + error.message);
     }
+}
+
+/**
+ * Direkte URL in die Zwischenablage kopieren
+ */
+function copyDirectUrl() {
+    const urlInput = document.getElementById('stream-url-input');
+    if (urlInput) {
+        urlInput.select();
+        urlInput.setSelectionRange(0, 99999); // Für mobile Geräte
+
+        navigator.clipboard.writeText(urlInput.value).then(() => {
+            showToast(t('urlCopied'), 'success');
+        }).catch(err => {
+            console.error('Failed to copy URL:', err);
+            // Fallback für ältere Browser
+            document.execCommand('copy');
+            showToast(t('urlCopied'), 'success');
+        });
+    }
+}
+
+/**
+ * URL in neuem Tab öffnen (für Media-Player)
+ */
+function openInPlayer() {
+    const urlInput = document.getElementById('stream-url-input');
+    if (urlInput) {
+        window.open(urlInput.value, '_blank');
+    }
+}
+
+/**
+ * Toast-Nachricht anzeigen
+ */
+function showToast(message, type = 'info') {
+    // Bestehende Toasts entfernen
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    // Nach 3 Sekunden entfernen
+    setTimeout(() => {
+        toast.classList.add('toast-hide');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 function toggleFileSelection(event, path) {
