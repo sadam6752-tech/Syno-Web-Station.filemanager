@@ -802,22 +802,66 @@ async function showFileInfo(path) {
 
 /**
  * Direkte URL in die Zwischenablage kopieren
+ * Funktioniert auf allen Plattformen: Firefox, Chrome, iOS Safari, Android
  */
-function copyDirectUrl() {
+async function copyDirectUrl() {
     const urlInput = document.getElementById('stream-url-input');
-    if (urlInput) {
+    if (!urlInput) return;
+
+    const url = urlInput.value;
+
+    // Methode 1: Moderne Clipboard API (Chrome, Firefox, Edge)
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+            await navigator.clipboard.writeText(url);
+            showToast(t('urlCopied'), 'success');
+            return;
+        } catch (err) {
+            console.warn('Clipboard API failed, trying fallback:', err);
+        }
+    }
+
+    // Methode 2: Fallback für iOS Safari und ältere Browser
+    try {
+        // Textfeld auswählen
+        urlInput.focus();
         urlInput.select();
         urlInput.setSelectionRange(0, 99999); // Für mobile Geräte
 
-        navigator.clipboard.writeText(urlInput.value).then(() => {
+        // ExecCommand als Fallback
+        const successful = document.execCommand('copy');
+        if (successful) {
             showToast(t('urlCopied'), 'success');
-        }).catch(err => {
-            console.error('Failed to copy URL:', err);
-            // Fallback für ältere Browser
-            document.execCommand('copy');
-            showToast(t('urlCopied'), 'success');
-        });
+            return;
+        }
+    } catch (err) {
+        console.warn('execCommand failed:', err);
     }
+
+    // Methode 3: iOS Safari Fallback - temporäres Textfeld erstellen
+    try {
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+
+        if (successful) {
+            showToast(t('urlCopied'), 'success');
+            return;
+        }
+    } catch (err) {
+        console.error('All copy methods failed:', err);
+    }
+
+    // Wenn alles fehlschlägt
+    showToast('Failed to copy URL - please copy manually', 'error');
 }
 
 /**
